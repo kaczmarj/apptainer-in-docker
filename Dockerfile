@@ -19,4 +19,5 @@ ENV PATH="/usr/local/singularity/bin:$PATH" \
 RUN apk add --no-cache ca-certificates libseccomp squashfs-tools \
     && rm -rf /tmp/* \
     && mkdir -p $SINGULARITY_TMPDIR
+WORKDIR /work
 ENTRYPOINT ["/usr/local/singularity/bin/singularity"]
