@@ -6,11 +6,20 @@ The Dockerfile in this repository builds Singularity 3.x. The resulting Docker i
 
 ## Build Singularity image in Docker
 
-With the following command, we build a small Singularity image defined in [`Singularity_test`](Singularity_test). This Singularity image will be saved in the current directory as `myimage.sif`.
+With the following command, we build a small Singularity image defined in [`Singularity_test`](Singularity_test). This Singularity image will be saved in the current directory as `myimage.sif` (3.x) or `myimage.simg` (2.x).
+
+Singularity 3.x
 
 ```bash
 $ docker run --rm --privileged -v $(pwd):/work kaczmarj/singularity:3.0.2 \
-  build /work/myimage.sif /work/Singularity_test
+  build myimage.sif Singularity_test
+```
+
+Singularity 2.x
+
+```bash
+$ docker run --rm --privileged -v $(pwd):/work kaczmarj/singularity:2.6.1 \
+  build myimage.simg Singularity_test
 ```
 
 ## Run Singularity image in Docker
@@ -19,6 +28,11 @@ One can run a Singularity image within this Docker image. This is not recommende
 
 ```bash
 $ docker run --rm --privileged kaczmarj/singularity:3.0.2 \
+  run shub://GodloveD/lolcow
+```
+
+```bash
+$ docker run --rm --privileged kaczmarj/singularity:2.6.1 \
   run shub://GodloveD/lolcow
 ```
 
@@ -34,4 +48,10 @@ Bleeding-edge (master branch):
 
 ```bash
 $ docker build --build-arg SINGULARITY_COMMITISH=master -t singularity:latest - < Dockerfile
+```
+
+Singularity 2.6.1:
+
+```bash
+$ docker build --build-arg SINGULARITY_COMMITISH=2.6.1 -t singularity:2.6.1 - < Dockerfile.2x
 ```
