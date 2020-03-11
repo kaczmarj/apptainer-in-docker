@@ -11,7 +11,7 @@ With the following command, we build a small Singularity image defined in [`Sing
 Singularity 3.x
 
 ```bash
-$ docker run --rm --privileged -v $(pwd):/work kaczmarj/singularity:3.0.2 \
+$ docker run --rm --privileged -v $(pwd):/work kaczmarj/singularity:3.5.3 \
   build myimage.sif Singularity_test
 ```
 
@@ -27,7 +27,7 @@ $ docker run --rm --privileged -v $(pwd):/work kaczmarj/singularity:2.6.1 \
 One can run a Singularity image within this Docker image. This is not recommended, but it is possible.
 
 ```bash
-$ docker run --rm --privileged kaczmarj/singularity:3.0.2 \
+$ docker run --rm --privileged kaczmarj/singularity:3.5.3 \
   run shub://GodloveD/lolcow
 ```
 
@@ -38,10 +38,10 @@ $ docker run --rm --privileged kaczmarj/singularity:2.6.1 \
 
 ## Build image
 
-Singularity version 3.0.2:
+Singularity version 3.5.3:
 
 ```bash
-$ docker build --build-arg SINGULARITY_COMMITISH=v3.0.2 -t singularity:3.0.2 - < Dockerfile
+$ docker build --build-arg SINGULARITY_COMMITISH=v3.5.3 -t singularity:3.5.3 - < Dockerfile
 ```
 
 Bleeding-edge (master branch):
