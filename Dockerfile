@@ -1,4 +1,4 @@
-FROM golang:1.11-alpine as builder
+FROM golang:1.14.0-alpine as builder
 
 ARG SINGULARITY_COMMITISH="master"
 
