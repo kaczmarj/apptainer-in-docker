@@ -6,6 +6,22 @@ You've heard of [Docker in Docker](https://github.com/jpetazzo/dind), but what a
 
 The Dockerfile in this repository builds Singularity 3.x. The resulting Docker image can be used on any system with Docker to build Singularity images. This project is targeted towards high-performance computing users who have Singularity installed on their clusters but do not have Singularity on their local computers to build images.
 
+## Convert local Docker image to Singularity format
+
+In the following example, we convert an existing Docker image to Singularity format.
+
+```bash
+$ docker pull alpine:3.11
+$ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/work \
+    kaczmarj/singularity:3.8.0 build alpine_3.11.sif docker-daemon://alpine:3.11
+```
+
+This output `.sif` file will be owned by root, so you can change ownership:
+
+```bash
+sudo chown USER:GROUP alpine_3.11.sif
+```
+
 ## Build Singularity image in Docker
 
 With the following command, we build a small Singularity image defined in [`Singularity_test`](Singularity_test). This Singularity image will be saved in the current directory `myimage.sif`.
