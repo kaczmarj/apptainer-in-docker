@@ -1,6 +1,7 @@
 # Singularity in Docker
 
-[![Docker images available at kaczmarj/singularity](https://img.shields.io/badge/DockerHub-kaczmarj/singularity-blue)](https://hub.docker.com/r/kaczmarj/singularity/tags)
+[![Docker images available at kaczmarj/singularity](https://img.shields.io/badge/DockerHub-kaczmarj/singularity-blue)](https://hub.docker.com/r/kaczmarj/singularity)
+[![Docker pulls](https://img.shields.io/docker/pulls/kaczmarj/singularity)](https://hub.docker.com/r/kaczmarj/singularity)
 
 You've heard of [Docker in Docker](https://github.com/jpetazzo/dind), but what about Singularity in Docker?
 
