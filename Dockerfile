@@ -1,10 +1,22 @@
-FROM golang:1.15.7-alpine3.13 as builder
+FROM golang:1.17.6-alpine3.15 as builder
 
-WORKDIR $GOPATH/src/github.com/sylabs
-RUN apk add --no-cache gawk gcc git libc-dev linux-headers libressl-dev libuuid libseccomp-dev make util-linux-dev
+RUN apk add --no-cache \
+        # Required for singularity to find min go version
+        bash \
+        gawk \
+        gcc \
+        git \
+        libc-dev \
+        linux-headers \
+        libressl-dev \
+        libuuid \
+        libseccomp-dev \
+        make \
+        util-linux-dev
 
 ARG SINGULARITY_COMMITISH="master"
-RUN git clone https://github.com/sylabs/singularity.git \
+WORKDIR $GOPATH/src/github.com/apptainer
+RUN git clone https://github.com/apptainer/singularity.git \
     && cd singularity \
     && git checkout "$SINGULARITY_COMMITISH" \
     && ./mconfig -p /usr/local/singularity \
@@ -12,7 +24,7 @@ RUN git clone https://github.com/sylabs/singularity.git \
     && make \
     && make install
 
-FROM alpine:3.13
+FROM alpine:3.15
 COPY --from=builder /usr/local/singularity /usr/local/singularity
 ENV PATH="/usr/local/singularity/bin:$PATH" \
     SINGULARITY_TMPDIR="/tmp-singularity"
