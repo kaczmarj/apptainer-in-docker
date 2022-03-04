@@ -1,8 +1,9 @@
 FROM golang:1.17.6-alpine3.15 as builder
 
 RUN apk add --no-cache \
-        # Required for singularity to find min go version
+        # Required for apptainer to find min go version
         bash \
+        cryptsetup \
         gawk \
         gcc \
         git \
@@ -14,24 +15,24 @@ RUN apk add --no-cache \
         make \
         util-linux-dev
 
-ARG SINGULARITY_COMMITISH="master"
+ARG APPTAINER_COMMITISH="main"
 WORKDIR $GOPATH/src/github.com/apptainer
-RUN git clone https://github.com/apptainer/singularity.git \
-    && cd singularity \
-    && git checkout "$SINGULARITY_COMMITISH" \
-    && ./mconfig -p /usr/local/singularity \
+RUN git clone https://github.com/apptainer/apptainer.git \
+    && cd apptainer \
+    && git checkout "$APPTAINER_COMMITISH" \
+    && ./mconfig -p /usr/local/apptainer \
     && cd builddir \
     && make \
     && make install
 
 FROM alpine:3.15
-COPY --from=builder /usr/local/singularity /usr/local/singularity
-ENV PATH="/usr/local/singularity/bin:$PATH" \
-    SINGULARITY_TMPDIR="/tmp-singularity"
+COPY --from=builder /usr/local/apptainer /usr/local/apptainer
+ENV PATH="/usr/local/apptainer/bin:$PATH" \
+    APPTAINER_TMPDIR="/tmp-apptainer"
 RUN apk add --no-cache ca-certificates libseccomp squashfs-tools tzdata \
-    && mkdir -p $SINGULARITY_TMPDIR \
+    && mkdir -p $APPTAINER_TMPDIR \
     && cp /usr/share/zoneinfo/UTC /etc/localtime \
     && apk del tzdata \
     && rm -rf /tmp/* /var/cache/apk/*
 WORKDIR /work
-ENTRYPOINT ["/usr/local/singularity/bin/singularity"]
+ENTRYPOINT ["/usr/local/apptainer/bin/apptainer"]
