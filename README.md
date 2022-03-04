@@ -73,5 +73,5 @@ $ docker build --build-arg APPTAINER_COMMITISH=v1.0.0 -t apptainer:1.0.0 - < Doc
 Bleeding-edge (main branch):
 
 ```bash
-$ docker build --build-arg APPTAINER_COMMITISH=master -t apptainer:latest - < Dockerfile
+$ docker build --build-arg APPTAINER_COMMITISH=main -t apptainer:latest - < Dockerfile
 ```
