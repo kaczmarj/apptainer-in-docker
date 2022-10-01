@@ -20,7 +20,7 @@ WORKDIR $GOPATH/src/github.com/apptainer
 RUN git clone https://github.com/apptainer/apptainer.git \
     && cd apptainer \
     && git checkout "$APPTAINER_COMMITISH" \
-    && ./mconfig -p /usr/local/apptainer \
+    && ./mconfig --without-suid -p /usr/local/apptainer \
     && cd builddir \
     && make \
     && make install
