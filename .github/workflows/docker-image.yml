@@ -2,6 +2,14 @@ name: Docker Image CI
 
 on:
   workflow_dispatch:
+    inputs:
+      APPTAINER_COMMITISH:
+        description: 'Apptainer version'
+        required: true
+        default: 'v1.1.0'
+        options:
+          - 'main'
+          - 'v1.1.0'
 
 jobs:
   build:
@@ -9,4 +17,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build .
+      run: docker build --build-arg APPTAINER_COMMITISH=${{github.event.inputs.APPTAINER_COMMITISH}} .
