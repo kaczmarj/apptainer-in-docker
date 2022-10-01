@@ -5,6 +5,7 @@ on:
     inputs:
       APPTAINER_COMMITISH:
         description: 'Apptainer version'
+        type: choice
         required: true
         default: 'v1.1.0'
         options:
