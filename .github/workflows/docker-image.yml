@@ -7,10 +7,11 @@ on:
         description: 'Apptainer version'
         type: choice
         required: true
-        default: 'v1.1.0'
+        default: 'v1.1.2'
         options:
           - 'main'
           - 'v1.1.0'
+          - 'v1.1.2'
 
 jobs:
   build:
