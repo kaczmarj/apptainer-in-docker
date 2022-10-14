@@ -16,11 +16,12 @@ RUN apk add --no-cache \
         util-linux-dev
 
 ARG APPTAINER_COMMITISH="main"
+ARG MCONFIG_OPTIONS="--with-suid"
 WORKDIR $GOPATH/src/github.com/apptainer
 RUN git clone https://github.com/apptainer/apptainer.git \
     && cd apptainer \
     && git checkout "$APPTAINER_COMMITISH" \
-    && ./mconfig --with-suid -p /usr/local/apptainer \
+    && ./mconfig $MCONFIG_OPTIONS -p /usr/local/apptainer \
     && cd builddir \
     && make \
     && make install
