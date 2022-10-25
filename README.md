@@ -16,7 +16,7 @@ In the following example, we convert an existing Docker image to Apptainer forma
 ```bash
 $ docker pull alpine:3.11
 $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/work \
-    kaczmarj/apptainer:1.0.0 build alpine_3.11.sif docker-daemon://alpine:3.11
+    kaczmarj/apptainer build alpine_3.11.sif docker-daemon://alpine:3.11
 ```
 
 This output `.sif` file will be owned by root, so you can change ownership:
@@ -30,7 +30,7 @@ sudo chown USER:GROUP alpine_3.11.sif
 With the following command, we build a small Apptainer image defined in [`test_alpine.def`](test_alpine.def). This Apptainer image will be saved in the current directory `myimage.sif`.
 
 ```bash
-$ docker run --rm --privileged -v $(pwd):/work kaczmarj/apptainer:1.0.0 \
+$ docker run --rm --privileged -v $(pwd):/work kaczmarj/apptainer \
   build myimage.sif test_alpine.def
 ```
 
@@ -39,7 +39,7 @@ $ docker run --rm --privileged -v $(pwd):/work kaczmarj/apptainer:1.0.0 \
 One can run a Apptainer image within this Docker image. This is not recommended, but it is possible.
 
 ```bash
-$ docker run --rm --privileged kaczmarj/apptainer:1.0.0 \
+$ docker run --rm --privileged kaczmarj/apptainer \
   run shub://GodloveD/lolcow
 ```
 
@@ -64,14 +64,14 @@ INFO:    Downloading shub image
 
 ## Build image
 
-Apptainer version 1.1.2:
+Apptainer version 1.1.3:
 
 ```bash
-$ docker build --build-arg APPTAINER_COMMITISH=v1.1.2 -t apptainer:1.1.2 - < Dockerfile
+$ docker build --build-arg APPTAINER_COMMITISH=v1.1.3 -t apptainer:1.1.3 .
 ```
 
 Bleeding-edge (main branch):
 
 ```bash
-$ docker build --build-arg APPTAINER_COMMITISH=main -t apptainer:latest - < Dockerfile
+$ docker build --build-arg APPTAINER_COMMITISH=main -t apptainer:latest .
 ```
