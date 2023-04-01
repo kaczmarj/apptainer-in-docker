@@ -1,5 +1,5 @@
 Bootstrap: docker
-From: alpine:3.7
+From: alpine:3.17
 
 %post
 echo "You are building me, an Alpine Linux image."
