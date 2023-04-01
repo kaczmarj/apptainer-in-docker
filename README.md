@@ -14,15 +14,15 @@ See the [Linux Foundation post](https://www.linuxfoundation.org/press-release/ne
 In the following example, we convert an existing Docker image to Apptainer format.
 
 ```bash
-$ docker pull alpine:3.11
+$ docker pull alpine:3.17
 $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/work \
-    kaczmarj/apptainer build alpine_3.11.sif docker-daemon://alpine:3.11
+    kaczmarj/apptainer build alpine_3.17.sif docker-daemon://alpine:3.17
 ```
 
 This output `.sif` file will be owned by root, so you can change ownership:
 
 ```bash
-sudo chown USER:GROUP alpine_3.11.sif
+sudo chown USER:GROUP alpine_3.17.sif
 ```
 
 ## Build Apptainer image in Docker
@@ -64,10 +64,10 @@ INFO:    Downloading shub image
 
 ## Build image
 
-Apptainer version 1.1.6:
+Apptainer version 1.1.7:
 
 ```bash
-$ docker build --build-arg APPTAINER_COMMITISH=v1.1.6 -t apptainer:1.1.6 .
+$ docker build --build-arg APPTAINER_COMMITISH=v1.1.7 -t apptainer:1.1.7 .
 ```
 
 Bleeding-edge (main branch):
