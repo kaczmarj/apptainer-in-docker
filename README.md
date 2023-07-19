@@ -6,8 +6,9 @@
 
 The Dockerfile in this repository builds Apptainer. The resulting Docker image can be used on any system with Docker to build Apptainer images. This project is targeted towards high-performance computing users who have Apptainer/Singularity installed on their clusters but do not have Apptainer/Singularity on their local computers to build images.
 
+
 **Note**: This project previously built Singularity.
-See the [Linux Foundation post](https://www.linuxfoundation.org/press-release/new-linux-foundation-project-accelerates-collaboration-on-container-systems-between-enterprise-and-high-performance-computing-environments/) regarding the name change to Apptainer.
+See the [Linux Foundation post](https://www.linuxfoundation.org/press/press-release/new-linux-foundation-project-accelerates-collaboration-on-container-systems-between-enterprise-and-high-performance-computing-environments) regarding the name change to Apptainer.
 
 ## Convert local Docker image to Apptainer format
 
