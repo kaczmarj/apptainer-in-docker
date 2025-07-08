@@ -12,11 +12,10 @@ RUN    apk add --no-cache tzdata \
 
 RUN    apk upgrade --no-cache \
     && apk add --no-cache apptainer
-#    && apk add --no-cache squashfuse fuse2fs gocryptfs
 
 RUN    addgroup -g ${groupid} ${groupname} \
-    && adduser -D -g "" -u ${userid} -G ${groupname} ${username}
+    && adduser -D -g "" -u ${userid} -G ${groupname} -h /work ${username}
 
 USER ${username}
-WORKDIR /home/${username}
+WORKDIR /work
 ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/apptainer"]
