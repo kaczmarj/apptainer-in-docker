@@ -1,31 +1,25 @@
 name: Docker Image CI
 
 on:
+  push:
+  pull_request:
   workflow_dispatch:
-    inputs:
-      APPTAINER_COMMITISH:
-        description: 'Apptainer version'
-        type: choice
-        required: true
-        default: 'v1.3.2'
-        options:
-          - 'main'
-          - 'v1.1.0'
-          - 'v1.1.2'
-          - 'v1.1.3'
-          - 'v1.1.4'
-          - 'v1.1.5'
-          - 'v1.1.6'
-          - 'v1.1.7'
-          - 'v1.1.8'
-          - 'v1.1.9'
-          - 'v1.2.0'
-          - 'v1.3.2'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Build the Docker image
-      run: docker build --build-arg APPTAINER_COMMITISH=${{github.event.inputs.APPTAINER_COMMITISH}} .
+      run: docker build -t ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:latest .
+
+    - name: Push the Docker image
+      run: docker push ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:latest
