@@ -1,40 +1,22 @@
-FROM golang:1.23.3-alpine3.20 AS builder
+FROM alpine
 
-RUN apk add --no-cache \
-        # Required for apptainer to find min go version
-        bash \
-        binutils-gold \
-        cryptsetup \
-        gawk \
-        gcc \
-        git \
-        libc-dev \
-        linux-headers \
-        libressl-dev \
-        libuuid \
-        libseccomp-dev \
-        make \
-        util-linux-dev
+ARG username=appuser
+ARG groupname=$username
+ARG userid=1000
+ARG groupid=1000
 
-ARG APPTAINER_COMMITISH="main"
-ARG MCONFIG_OPTIONS="--with-suid"
-WORKDIR $GOPATH/src/github.com/apptainer
-RUN git clone https://github.com/apptainer/apptainer.git \
-    && cd apptainer \
-    && git checkout "$APPTAINER_COMMITISH" \
-    && ./mconfig $MCONFIG_OPTIONS -p /usr/local/apptainer \
-    && cd builddir \
-    && make \
-    && make install
-
-FROM alpine:3.20
-COPY --from=builder /usr/local/apptainer /usr/local/apptainer
-ENV PATH="/usr/local/apptainer/bin:$PATH" \
-    APPTAINER_TMPDIR="/tmp-apptainer"
-RUN apk add --no-cache ca-certificates libseccomp squashfs-tools tzdata \
-    && mkdir -p $APPTAINER_TMPDIR \
+RUN    apk add --no-cache tzdata \
     && cp /usr/share/zoneinfo/UTC /etc/localtime \
     && apk del tzdata \
-    && rm -rf /tmp/* /var/cache/apk/*
-WORKDIR /work
-ENTRYPOINT ["/usr/local/apptainer/bin/apptainer"]
+    && apk add tini
+
+RUN    apk upgrade --no-cache \
+    && apk add --no-cache apptainer
+#    && apk add --no-cache squashfuse fuse2fs gocryptfs
+
+RUN    addgroup -g ${groupid} ${groupname} \
+    && adduser -D -g "" -u ${userid} -G ${groupname} ${username}
+
+USER ${username}
+WORKDIR /home/${username}
+ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/apptainer"]
