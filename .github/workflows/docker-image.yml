@@ -1,31 +1,80 @@
-name: Docker Image CI
+name: Docker Image Construction and Publishing
+description: Build and publish Docker images for Apptainer in Docker, with options for package version
 
 on:
+  push:
+    branches:
+      - main
+      - alb
+      - 'ALB/*'
+    tags:
+      - 'v*'
+  pull_request:
   workflow_dispatch:
     inputs:
       APPTAINER_COMMITISH:
         description: 'Apptainer version'
         type: choice
         required: true
-        default: 'v1.3.2'
+        default: 'v1.4.1'
         options:
-          - 'main'
-          - 'v1.1.0'
-          - 'v1.1.2'
-          - 'v1.1.3'
-          - 'v1.1.4'
-          - 'v1.1.5'
-          - 'v1.1.6'
-          - 'v1.1.7'
-          - 'v1.1.8'
+          - 'v1.0.3'
           - 'v1.1.9'
-          - 'v1.2.0'
-          - 'v1.3.2'
+          - 'v1.2.5'
+          - 'v1.3.6'
+          - 'v1.4.1'
 
 jobs:
-  build:
+  build_push_pr:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build --build-arg APPTAINER_COMMITISH=${{github.event.inputs.APPTAINER_COMMITISH}} .
+    - name: Get short SHA-1 and Apptainer last release
+      id: vars
+      run: |
+        echo "git_hash_short=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
+        echo "apptainer_release=$(curl -s https://api.github.com/repos/apptainer/apptainer/releases/latest | jq -r '.tag_name')" >> $GITHUB_OUTPUT
+        echo "build_date=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
+    - name: Build the Docker image (package version)
+      run: docker build -t apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} -f package/Dockerfile .
+    - name: Test the Docker image (package version) - print Apptainer version
+      run: docker run --rm apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} version
+    - name: Build the Docker image (compile last stable)
+      run: docker build --build-arg APPTAINER_COMMITISH=${{ steps.vars.outputs.apptainer_release }} -t apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ steps.vars.outputs.apptainer_release }} -f compile/Dockerfile .
+    - name: Test the Docker image (compile last stable) - print Apptainer version
+      run: docker run --rm apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ steps.vars.outputs.apptainer_release }} version
+
+
+  build_and_publish_dispatch:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - uses: actions/checkout@v3
+    - name: Get short SHA-1 and Apptainer last release
+      id: vars
+      run: |
+        echo "git_hash_short=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
+        echo "build_date=$(date -u +'%Y%m%d')" >> $GITHUB_OUTPUT
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build the Docker image (package version)
+      run: docker build -t ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} -t ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:latest -f package/Dockerfile .
+    - name: Test the Docker image (package version) - print Apptainer version
+      run: docker run --rm ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} version
+    - name: Build the Docker image (compile required version)
+      run: docker build --build-arg APPTAINER_COMMITISH=${{ github.event.inputs.APPTAINER_COMMITISH }} -t ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ github.event.inputs.APPTAINER_COMMITISH }} -f compile/Dockerfile .
+    - name: Test the Docker image (compile required version stable) - print Apptainer version
+      run: docker run --rm ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ github.event.inputs.APPTAINER_COMMITISH }} version
+    - name: Push the Docker images
+      run: |
+        docker push ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:latest
+        docker push ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }}
+        docker push ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ github.event.inputs.APPTAINER_COMMITISH }}
