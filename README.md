@@ -1,54 +1,53 @@
 # Apptainer in Docker
 
-[![Docker images available at kaczmarj/apptainer](https://img.shields.io/badge/DockerHub-kaczmarj/apptainer-blue)](https://hub.docker.com/r/kaczmarj/apptainer)
-[![Docker pulls](https://img.shields.io/docker/pulls/kaczmarj/apptainer)](https://hub.docker.com/r/kaczmarj/apptainer)
-[![Docker pulls](https://img.shields.io/docker/pulls/kaczmarj/singularity)](https://hub.docker.com/r/kaczmarj/singularity)
+[![Docker images available at ghcr.io/alberto743/apptainer-in-docker](https://img.shields.io/badge/GHCR-ghcr.io%2Falberto743%2Fapptainer--in--docker-blue)](https://github.com/alberto743/apptainer-in-docker/pkgs/container/apptainer-in-docker)
 
-The Dockerfile in this repository builds Apptainer. The resulting Docker image can be used on any system with Docker to build Apptainer images. This project is targeted towards high-performance computing users who have Apptainer/Singularity installed on their clusters but do not have Apptainer/Singularity on their local computers to build images.
+Two Docker recepies are availble in this repository;
+- [`package.Dockerfile`](package.Dockerfile) installs Apptainer based on the version available in [Alpine](https://pkgs.alpinelinux.org/package/edge/community/x86_64/apptainer)
+- [`compile.Dockerfile`](compile.Dockerfile) installs a custom version of Apptainer from sources based on the tag specified via the `APPTAINER_COMMITISH` build argument.
+The resulting Docker image can be used on any system with Docker or Podman to build Apptainer images.
+This project is targeted towards high-performance computing users who have Apptainer/Singularity installed on their clusters but do not have Apptainer/Singularity on their local computers to build images.
 
-
-**Note**: This project previously built Singularity.
-See the [Linux Foundation post](https://www.linuxfoundation.org/press/press-release/new-linux-foundation-project-accelerates-collaboration-on-container-systems-between-enterprise-and-high-performance-computing-environments) regarding the name change to Apptainer.
 
 ## Convert local Docker image to Apptainer format
 
 In the following example, we convert an existing Docker image to Apptainer format.
 
 ```bash
-$ docker pull alpine:3.18.2
+$ docker pull alpine:3.22
 $ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/work \
-    kaczmarj/apptainer build alpine_3.18.2.sif docker-daemon://alpine:3.18.2
+    ghcr.io/alberto743/apptainer-in-docker build alpine_3.22.sif docker-daemon://alpine:3.22
 ```
 
 This output `.sif` file will be owned by root, so you can change ownership:
 
 ```bash
-sudo chown USER:GROUP alpine_3.18.2.sif
+sudo chown USER:GROUP alpine_3.22.sif
 ```
 
 ## Build Apptainer image in Docker
 
-With the following command, we build a small Apptainer image defined in [`test_alpine.def`](test_alpine.def). This Apptainer image will be saved in the current directory `myimage.sif`.
+With the following command, we build a small Apptainer image defined in [`test_alpine.def`](test_alpine.def).
+This Apptainer image will be saved in the current directory `myimage.sif`.
 
 ```bash
-$ docker run --rm --privileged -v $(pwd):/work kaczmarj/apptainer \
+$ docker run --rm --privileged -v $(pwd):/work ghcr.io/alberto743/apptainer-in-docker \
   build myimage.sif test_alpine.def
 ```
 
 ## Run Apptainer image in Docker
 
-One can run a Apptainer image within this Docker image. This is not recommended, but it is possible.
+One can run a Apptainer image within this Docker image.
+This is not recommended, but it is possible.
 
 ```bash
-$ docker run --rm --privileged kaczmarj/apptainer \
+$ docker run --rm ghcr.io/alberto743/apptainer-in-docker \
   run shub://GodloveD/lolcow
 ```
 
 Here is the output:
 
 ```
-INFO:    Downloading shub image
-87.6MiB / 87.6MiB [======================================================================================================================================================] 100 % 1.4 MiB/s 0s
  _________________________________________
 / He that is giddy thinks the world turns \
 | round.                                  |
@@ -63,16 +62,24 @@ INFO:    Downloading shub image
                 ||     ||
 ```
 
+The previous command may require `--privileged`.
+
 ## Build image
+
+It is possible to compile a custom version of Apptainer by using the [`compile/Dockerfile`](compile/Dockerfile).
 
 Apptainer version 1.2.0:
 
 ```bash
-$ docker build --build-arg APPTAINER_COMMITISH=v1.2.0 -t apptainer:1.2.0 .
+$ docker build --build-arg APPTAINER_COMMITISH=v1.2.0 \
+               -t apptainer:1.2.0 \
+               -f compile/Dockerfile .
 ```
 
 Bleeding-edge (main branch):
 
 ```bash
-$ docker build --build-arg APPTAINER_COMMITISH=main -t apptainer:latest .
+$ docker build --build-arg APPTAINER_COMMITISH=main \
+               -t apptainer:latest \
+               -f compile/Dockerfile .
 ```
