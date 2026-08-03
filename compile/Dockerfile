@@ -44,6 +44,7 @@ RUN    addgroup -g ${groupid} ${groupname} \
     && adduser -D -g "" -u ${userid} -G ${groupname} -h /work ${username}
 
 ENV APPTAINER_TMPDIR="/tmp-apptainer"
+RUN mkdir -p "$APPTAINER_TMPDIR" && chown ${userid}:${groupid} "$APPTAINER_TMPDIR"
 COPY --from=builder /usr/local/apptainer /usr/local/apptainer
 RUN apk add --no-cache libseccomp squashfs-tools
 ENV PATH="/usr/local/apptainer/bin:$PATH"

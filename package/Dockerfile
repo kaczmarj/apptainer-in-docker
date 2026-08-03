@@ -14,6 +14,7 @@ RUN    addgroup -g ${groupid} ${groupname} \
     && adduser -D -g "" -u ${userid} -G ${groupname} -h /work ${username}
 
 ENV APPTAINER_TMPDIR="/tmp-apptainer"
+RUN mkdir -p "$APPTAINER_TMPDIR" && chown ${userid}:${groupid} "$APPTAINER_TMPDIR"
 RUN apk add --no-cache apptainer
 
 USER ${username}
