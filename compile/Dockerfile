@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine3.22 AS builder
+FROM golang:1.25-alpine3.22 AS builder
 
 RUN apk add --no-cache \
         # Required for apptainer to find min go version
@@ -44,6 +44,7 @@ RUN    addgroup -g ${groupid} ${groupname} \
     && adduser -D -g "" -u ${userid} -G ${groupname} -h /work ${username}
 
 ENV APPTAINER_TMPDIR="/tmp-apptainer"
+RUN mkdir -p "$APPTAINER_TMPDIR" && chown ${userid}:${groupid} "$APPTAINER_TMPDIR"
 COPY --from=builder /usr/local/apptainer /usr/local/apptainer
 RUN apk add --no-cache libseccomp squashfs-tools
 ENV PATH="/usr/local/apptainer/bin:$PATH"
