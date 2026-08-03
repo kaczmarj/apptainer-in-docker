@@ -16,13 +16,14 @@ on:
         description: 'Apptainer version'
         type: choice
         required: true
-        default: 'v1.4.1'
+        default: 'v1.5.3'
         options:
           - 'v1.0.3'
           - 'v1.1.9'
           - 'v1.2.5'
           - 'v1.3.6'
-          - 'v1.4.1'
+          - 'v1.4.5'
+          - 'v1.5.3'
 
 jobs:
   build_push_pr:
