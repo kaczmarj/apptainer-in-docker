@@ -40,10 +40,14 @@ jobs:
       run: docker build -t apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} -f package/Dockerfile .
     - name: Test the Docker image (package version) - print Apptainer version
       run: docker run --rm apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} version
+    - name: Test the Docker image (package version) - run a container with Apptainer
+      run: docker run --rm --privileged --user root apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} run docker://alpine cat /etc/os-release
     - name: Build the Docker image (compile last stable)
       run: docker build --build-arg APPTAINER_COMMITISH=${{ steps.vars.outputs.apptainer_release }} -t apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ steps.vars.outputs.apptainer_release }} -f compile/Dockerfile .
     - name: Test the Docker image (compile last stable) - print Apptainer version
       run: docker run --rm apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ steps.vars.outputs.apptainer_release }} version
+    - name: Test the Docker image (compile last stable) - run a container with Apptainer
+      run: docker run --rm --privileged --user root apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ steps.vars.outputs.apptainer_release }} run docker://alpine cat /etc/os-release
 
 
   build_and_publish_dispatch:
@@ -69,10 +73,14 @@ jobs:
       run: docker build -t ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} -t ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:latest -f package/Dockerfile .
     - name: Test the Docker image (package version) - print Apptainer version
       run: docker run --rm ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} version
+    - name: Test the Docker image (package version) - run a container with Apptainer
+      run: docker run --rm --privileged --user root ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-package-${{ steps.vars.outputs.build_date }} run docker://alpine cat /etc/os-release
     - name: Build the Docker image (compile required version)
       run: docker build --build-arg APPTAINER_COMMITISH=${{ github.event.inputs.APPTAINER_COMMITISH }} -t ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ github.event.inputs.APPTAINER_COMMITISH }} -f compile/Dockerfile .
     - name: Test the Docker image (compile required version stable) - print Apptainer version
       run: docker run --rm ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ github.event.inputs.APPTAINER_COMMITISH }} version
+    - name: Test the Docker image (compile required version stable) - run a container with Apptainer
+      run: docker run --rm --privileged --user root ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:${{ steps.vars.outputs.git_hash_short }}-release-${{ github.event.inputs.APPTAINER_COMMITISH }} run docker://alpine cat /etc/os-release
     - name: Push the Docker images
       run: |
         docker push ghcr.io/${{ github.repository_owner }}/apptainer-in-docker:latest
